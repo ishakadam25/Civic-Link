@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'raise_complaint_screen.dart';
 import 'my_complaints_screen.dart';
+import 'announcements_screen.dart';
+import '../admin/admin_home_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -52,7 +54,14 @@ class HomeScreen extends StatelessWidget {
               title: "Announcements",
               icon: Icons.campaign,
               color: Colors.orange,
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const AnnouncementsScreen(),
+                  ),
+                );
+              },
             ),
 
             _buildCard(
@@ -69,6 +78,19 @@ class HomeScreen extends StatelessWidget {
               icon: Icons.train,
               color: Colors.purple,
               onTap: () {},
+            ),
+
+            _buildCard(
+              context,
+              title: "Admin Panel",
+              icon: Icons.admin_panel_settings,
+              color: Colors.black,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AdminHomeScreen()),
+                );
+              },
             ),
           ],
         ),
