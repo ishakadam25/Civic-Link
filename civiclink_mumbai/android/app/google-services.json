@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "625527546721",
+    "project_id": "civiclink-mumbai",
+    "storage_bucket": "civiclink-mumbai.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:625527546721:android:d1feebe8e4deac88339b20",
+        "android_client_info": {
+          "package_name": "com.example.civiclink_mumbai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCLFfghM0Cpz7IociyndWgHkO0afABkS9I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
