@@ -11,6 +11,7 @@ class ManageComplaintsScreen extends StatefulWidget {
 class _ManageComplaintsScreenState extends State<ManageComplaintsScreen> {
   String selectedArea = "All";
   DateTime? selectedDate;
+  String searchQuery = "";
 
   final List<String> areas = ["All", "Dadar", "Andheri", "Bandra", "Kurla"];
 
@@ -79,6 +80,21 @@ class _ManageComplaintsScreenState extends State<ManageComplaintsScreen> {
                   },
                   child: const Text("Select Date"),
                 ),
+                const SizedBox(height: 10),
+                TextField(
+                  decoration: InputDecoration(
+                    hintText: "Search complaints...",
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      searchQuery = value.toLowerCase();
+                    });
+                  },
+                ),
               ],
             ),
           ),
@@ -93,17 +109,57 @@ class _ManageComplaintsScreenState extends State<ManageComplaintsScreen> {
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                   return const Center(child: Text("No complaints found"));
                 }
-                final complaints = snapshot.data!.docs;
+                final allComplaints = snapshot.data!.docs;
+                
+                // Filter by search query
+                final filteredComplaints = allComplaints.where((doc) {
+                  final data = doc.data() as Map<String, dynamic>;
+                  final title = (data['title'] ?? '').toString().toLowerCase();
+                  final description = (data['description'] ?? '').toString().toLowerCase();
+                  return title.contains(searchQuery) || description.contains(searchQuery);
+                }).toList();
+
+                if (filteredComplaints.isEmpty) {
+                  return const Center(child: Text("No complaints found"));
+                }
+
                 return ListView.builder(
-                  itemCount: complaints.length,
+                  itemCount: filteredComplaints.length,
                   itemBuilder: (context, index) {
-                    final data =
-                        complaints[index].data() as Map<String, dynamic>;
+                    final data = filteredComplaints[index].data() as Map<String, dynamic>;
+
+                    print("Selected Area: $selectedArea");
+                    print("Firestore Area: ${data['area']}");
+
+                    print(data['imageUrl']);
                     return Card(
-                      child: ListTile(
-                        title: Text(data['title'] ?? 'No title'),
-                        subtitle: Text(data['description'] ?? 'No description'),
-                        // Add more fields like date, status, etc., as needed
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (data['imageUrl'] != null)
+                            Image.network(
+                              data['imageUrl'],
+                              height: 150,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
+
+                          ListTile(
+                            title: Text(
+                              data['title'] ?? 'No title',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(data['description'] ?? 'No description'),
+                                Text("Area: ${data['area'] ?? ''}"),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     );
                   },

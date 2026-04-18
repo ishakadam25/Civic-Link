@@ -1,15 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'raise_complaint_screen.dart';
 import 'my_complaints_screen.dart';
 import 'announcements_screen.dart';
 import '../admin/admin_home_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../citizen/bills_screen.dart';
+import 'tourist_place.dart';
 
 class HomeScreen extends StatelessWidget {
   final String role;
 
   const HomeScreen({super.key, required this.role});
+
+  void _logout(BuildContext context) async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      if (context.mounted) {
+        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Logout failed: $e')));
+      }
+    }
+  }
 
   void openMIndicator() async {
     final url = Uri.parse(
@@ -24,7 +41,17 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("CivicLink Mumbai"), centerTitle: true),
+      appBar: AppBar(
+        title: const Text("CivicLink Mumbai"),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Logout',
+            onPressed: () => _logout(context),
+          ),
+        ],
+      ),
 
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -97,6 +124,19 @@ class HomeScreen extends StatelessWidget {
               icon: Icons.train,
               color: Colors.purple,
               onTap: openMIndicator,
+            ),
+
+            _buildCard(
+              context,
+              title: "Tourist Attractions",
+              icon: Icons.place,
+              color: Colors.teal,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => TouristPlaceScreen()),
+                );
+              },
             ),
 
             if (role == 'admin')
