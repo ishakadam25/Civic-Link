@@ -3,8 +3,21 @@ import 'package:provider/provider.dart';
 import '../../providers/location_provider.dart';
 import 'weather_screen.dart';
 import 'emergency_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Main government services screen with navigation to features
+
+
+void openMIndicator() async {
+  final url = Uri.parse(
+    "https://play.google.com/store/apps/details?id=com.mobond.mindicator",
+  );
+
+  if (await canLaunchUrl(url)) {
+    await launchUrl(url, mode: LaunchMode.externalApplication);
+  }
+}
+
 class GovernmentServicesScreen extends StatefulWidget {
   const GovernmentServicesScreen({Key? key}) : super(key: key);
 

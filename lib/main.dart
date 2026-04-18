@@ -1,5 +1,5 @@
 /// Example of how to integrate Government Services into Civic-Link main.dart
-/// 
+///
 /// This file shows the recommended way to set up providers and routes
 /// for the Government Services feature.
 
@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'screens/auth/login_screen.dart';
+import 'screens/admin/admin_home_screen.dart';
 
 // Import all providers
 import 'providers/weather_provider.dart';
@@ -21,12 +23,11 @@ import 'services/location_service.dart';
 // Import screens
 import 'screens/government_services/government_services_screen.dart';
 import 'screens/citizen/home_screen.dart';
+import 'screens/profile/profile_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const CivicLinkApp());
 }
 
@@ -39,33 +40,23 @@ class CivicLinkApp extends StatelessWidget {
       providers: [
         // Location Service & Provider
         // Initialize LocationService first as it's a dependency
-        Provider<LocationService>(
-          create: (_) => LocationService(),
-        ),
+        Provider<LocationService>(create: (_) => LocationService()),
         ChangeNotifierProvider<LocationProvider>(
-          create: (context) => LocationProvider(
-            context.read<LocationService>(),
-          ),
+          create: (context) =>
+              LocationProvider(context.read<LocationService>()),
         ),
 
         // Weather Service & Provider
-        Provider<WeatherService>(
-          create: (_) => WeatherService(),
-        ),
+        Provider<WeatherService>(create: (_) => WeatherService()),
         ChangeNotifierProvider<WeatherProvider>(
-          create: (context) => WeatherProvider(
-            context.read<WeatherService>(),
-          ),
+          create: (context) => WeatherProvider(context.read<WeatherService>()),
         ),
 
         // Emergency Services API & Provider
-        Provider<EmergencyServiceAPI>(
-          create: (_) => EmergencyServiceAPI(),
-        ),
+        Provider<EmergencyServiceAPI>(create: (_) => EmergencyServiceAPI()),
         ChangeNotifierProvider<EmergencyProvider>(
-          create: (context) => EmergencyProvider(
-            context.read<EmergencyServiceAPI>(),
-          ),
+          create: (context) =>
+              EmergencyProvider(context.read<EmergencyServiceAPI>()),
         ),
       ],
       child: MaterialApp(
@@ -73,11 +64,9 @@ class CivicLinkApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
           useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.blue,
-          ),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         ),
-        home: const CivicLinkHome(),
+        home: const LoginScreen(),
         routes: {
           '/gov-services': (context) => const GovernmentServicesScreen(),
         },
@@ -88,7 +77,9 @@ class CivicLinkApp extends StatelessWidget {
 
 /// Example home screen showing how to access government services
 class CivicLinkHome extends StatefulWidget {
-  const CivicLinkHome({Key? key}) : super(key: key);
+  final String role;
+
+  const CivicLinkHome({Key? key, required this.role}) : super(key: key);
 
   @override
   State<CivicLinkHome> createState() => _CivicLinkHomeState();
@@ -98,32 +89,45 @@ class _CivicLinkHomeState extends State<CivicLinkHome> {
   int _selectedIndex = 0;
 
   // Pages for bottom navigation tabs
-  final List<Widget> _pages = const [
-    HomeScreen(),
-    GovernmentServicesScreen(),
-    Center(child: Text('Profile Page - Coming Soon')),
-  ];
+  late List<Widget> _pages;
 
-  final List<NavigationDestination> _destinations = const [
-    NavigationDestination(
-      icon: Icon(Icons.home),
-      label: 'Home',
-      selectedIcon: Icon(Icons.home),
-    ),
-    NavigationDestination(
-      icon: Icon(Icons.public),
-      label: 'Services',
-      selectedIcon: Icon(Icons.public),
-    ),
-    NavigationDestination(
-      icon: Icon(Icons.person),
-      label: 'Profile',
-      selectedIcon: Icon(Icons.person),
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+
+    _pages = [
+      HomeScreen(role: widget.role),
+      const GovernmentServicesScreen(),
+      const ProfileScreen(),
+      if (widget.role == 'admin') const AdminHomeScreen(), // only for admin
+    ];
+  }
+
+  List<NavigationDestination> get _destinations {
+    if (widget.role == 'admin') {
+      return const [
+        NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+        NavigationDestination(icon: Icon(Icons.public), label: 'Services'),
+        NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
+        NavigationDestination(
+          icon: Icon(Icons.admin_panel_settings),
+          label: 'Admin',
+        ),
+      ];
+    } else {
+      return const [
+        NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+        NavigationDestination(icon: Icon(Icons.public), label: 'Services'),
+        NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
+      ];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_selectedIndex >= _pages.length) {
+      _selectedIndex = 0;
+    }
     return Scaffold(
       body: _pages[_selectedIndex],
       bottomNavigationBar: NavigationBar(

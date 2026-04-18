@@ -1,14 +1,19 @@
 import '../models/weather_model.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 /// Service for fetching weather data from OpenWeatherMap API
 class WeatherService {
   // API Configuration - Replace with actual API key from environment
-  final String apiKey = 'YOUR_OPENWEATHERMAP_API_KEY';
+  final String apiKey = '71ddfea9a38bcb4ecc1e23f204f9d09b';
   final String baseUrl = 'https://api.openweathermap.org/data/2.5';
 
   /// Fetch current weather for given coordinates
   /// API Docs: https://openweathermap.org/current
-  Future<WeatherData> getCurrentWeather(double latitude, double longitude) async {
+  Future<WeatherData> getCurrentWeather(
+    double latitude,
+    double longitude,
+  ) async {
     try {
       // API endpoint with mock data fallback
       final url = Uri.parse(
@@ -17,13 +22,18 @@ class WeatherService {
 
       // For demonstration, using mock data
       // In production, uncomment the actual API call below:
-      // final response = await http.get(url);
-      // if (response.statusCode == 200) {
-      //   return WeatherData.fromJson(jsonDecode(response.body));
-      // }
+      final response = await http.get(url);
+
+      print(response.statusCode);
+      print(response.body);
+      if (response.statusCode == 200) {
+        return WeatherData.fromJson(jsonDecode(response.body));
+      } else {
+        throw Exception('Failed to load forecast');
+      }
 
       // Mock data for testing
-      return _getMockWeatherData(latitude, longitude);
+      // return _getMockWeatherData(latitude, longitude);
     } catch (e) {
       throw Exception('Failed to fetch weather: $e');
     }
@@ -43,17 +53,22 @@ class WeatherService {
 
       // For demonstration, using mock data
       // In production, uncomment the actual API call below:
-      // final response = await http.get(url);
-      // if (response.statusCode == 200) {
-      //   final data = jsonDecode(response.body);
-      //   final forecasts = (data['list'] as List)
-      //       .map((item) => WeatherForecast.fromJson(item))
-      //       .toList();
-      //   return forecasts;
-      // }
+      final response = await http.get(url);
+      print(response.statusCode);
+      print(response.body);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final forecasts = (data['list'] as List)
+            .map((item) => WeatherForecast.fromJson(item))
+            .toList();
+        return forecasts;
+      } else {
+        throw Exception('Failed to load forecast');
+      }
 
       // Mock data for testing
-      return _getMockForecastData();
+      // return _getMockForecastData();
     } catch (e) {
       throw Exception('Failed to fetch forecast: $e');
     }
@@ -69,12 +84,17 @@ class WeatherService {
 
       // For demonstration, using mock data
       // In production, uncomment the actual API call below:
-      // final response = await http.get(url);
-      // if (response.statusCode == 200) {
-      //   return WeatherData.fromJson(jsonDecode(response.body));
-      // }
+      final response = await http.get(url);
 
-      return _getMockWeatherDataByCity(cityName);
+      print(response.statusCode);
+      print(response.body);
+      if (response.statusCode == 200) {
+        return WeatherData.fromJson(jsonDecode(response.body));
+      } else {
+        throw Exception('Failed to load weather');
+      }
+
+      //return _getMockWeatherDataByCity(cityName);
     } catch (e) {
       throw Exception('Failed to fetch weather for city: $e');
     }

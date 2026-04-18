@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../services/cloudinary_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RaiseComplaintScreen extends StatefulWidget {
   const RaiseComplaintScreen({super.key});
@@ -54,6 +55,7 @@ class _RaiseComplaintScreenState extends State<RaiseComplaintScreen> {
       'area': _selectedArea,
       'status': 'pending',
       'timestamp': FieldValue.serverTimestamp(),
+      'userId': FirebaseAuth.instance.currentUser!.uid,
     });
 
     ScaffoldMessenger.of(

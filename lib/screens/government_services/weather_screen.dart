@@ -90,12 +90,14 @@ class _WeatherScreenState extends State<WeatherScreen> {
           }
 
           // Show loading state
-          if (weatherProvider.isLoading && weatherProvider.currentWeather == null) {
+          if (weatherProvider.isLoading &&
+              weatherProvider.currentWeather == null) {
             return const LoadingStateWidget(message: 'Fetching weather...');
           }
 
           // Show error state
-          if (weatherProvider.error != null && weatherProvider.currentWeather == null) {
+          if (weatherProvider.error != null &&
+              weatherProvider.currentWeather == null) {
             return ErrorStateWidget(
               message: weatherProvider.error ?? 'Failed to load weather',
               onRetry: () {
@@ -107,6 +109,11 @@ class _WeatherScreenState extends State<WeatherScreen> {
                 }
               },
             );
+          }
+
+          // If weather data is not yet available, show a loading placeholder
+          if (weatherProvider.currentWeather == null) {
+            return const LoadingStateWidget(message: 'Fetching weather...');
           }
 
           // Show weather data
@@ -123,32 +130,31 @@ class _WeatherScreenState extends State<WeatherScreen> {
                 );
               }
             },
+
+            child: SafeArea(
             child: ListView(
+              physics: AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(16),
               children: [
                 // Current weather card
-                if (weatherProvider.currentWeather != null)
-                  WeatherCard(
-                    weather: weatherProvider.currentWeather!,
-                    onRefresh: () {
-                      if (locationProvider.currentLocation != null) {
-                        weatherProvider.fetchWeather(
-                          locationProvider.currentLocation!.latitude,
-                          locationProvider.currentLocation!.longitude,
-                        );
-                      }
-                    },
-                  ),
+                WeatherCard(
+                  weather: weatherProvider.currentWeather!,
+                  onRefresh: () {
+                    if (locationProvider.currentLocation != null) {
+                      weatherProvider.fetchWeather(
+                        locationProvider.currentLocation!.latitude,
+                        locationProvider.currentLocation!.longitude,
+                      );
+                    }
+                  },
+                ),
                 const SizedBox(height: 24),
-                
+
                 // Forecast section
                 if (weatherProvider.forecast.isNotEmpty) ...[
                   const Text(
                     '5-Day Forecast',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
                   SizedBox(
@@ -172,46 +178,48 @@ class _WeatherScreenState extends State<WeatherScreen> {
                   const SizedBox(height: 24),
                 ],
 
-                // Additional information
-                const Text(
-                  'Weather Information',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                if (weatherProvider.currentWeather != null) ...[
+                  const Text(
+                    'Weather Information',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                ),
-                const SizedBox(height: 12),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildInfoRow(
-                          'Visibility',
-                          '${(weatherProvider.currentWeather!.visibility / 1000).toStringAsFixed(1)} km',
-                        ),
-                        const Divider(),
-                        _buildInfoRow(
-                          'Cloudiness',
-                          '${weatherProvider.currentWeather!.cloudiness.toStringAsFixed(0)}%',
-                        ),
-                        const Divider(),
-                        _buildInfoRow(
-                          'Sunrise',
-                          _formatTime(weatherProvider.currentWeather!.sunrise),
-                        ),
-                        const Divider(),
-                        _buildInfoRow(
-                          'Sunset',
-                          _formatTime(weatherProvider.currentWeather!.sunset),
-                        ),
-                      ],
+                  const SizedBox(height: 12),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildInfoRow(
+                            'Visibility',
+                            '${(weatherProvider.currentWeather!.visibility / 1000).toStringAsFixed(1)} km',
+                          ),
+                          const Divider(),
+                          _buildInfoRow(
+                            'Cloudiness',
+                            '${weatherProvider.currentWeather!.cloudiness.toStringAsFixed(0)}%',
+                          ),
+                          const Divider(),
+                          _buildInfoRow(
+                            'Sunrise',
+                            _formatTime(
+                              weatherProvider.currentWeather!.sunrise,
+                            ),
+                          ),
+                          const Divider(),
+                          _buildInfoRow(
+                            'Sunset',
+                            _formatTime(weatherProvider.currentWeather!.sunset),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
+                ],
               ],
             ),
+            )
           );
         },
       ),
@@ -225,19 +233,10 @@ class _WeatherScreenState extends State<WeatherScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.grey,
-              fontSize: 14,
-            ),
-          ),
+          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 14)),
           Text(
             value,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-            ),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
           ),
         ],
       ),

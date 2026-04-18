@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 class MyComplaintsScreen extends StatelessWidget {
   const MyComplaintsScreen({super.key});
@@ -14,6 +16,7 @@ class MyComplaintsScreen extends StatelessWidget {
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('complaints')
+            .where('userId', isEqualTo: FirebaseAuth.instance.currentUser!.uid)
             .orderBy('timestamp', descending: true)
             .snapshots(),
 
