@@ -1,3 +1,4 @@
+import 'package:geolocator/geolocator.dart';
 import '../models/emergency_model.dart';
 
 /// Service for finding nearby emergency services using Google Places API
@@ -24,17 +25,40 @@ class EmergencyServiceAPI {
       );
 
       // For demonstration, using mock data
-      // In production, uncomment the actual API call below:
-      // final response = await http.get(url);
-      // if (response.statusCode == 200) {
-      //   final data = jsonDecode(response.body);
-      //   return (data['results'] as List)
-      //       .map((item) => EmergencyService.fromJson(item, type))
-      //       .toList();
-      // }
+      final rawServices = _getMockServices(type);
+      
+      final servicesWithDistance = rawServices.map((service) {
+        final distanceMeters = Geolocator.distanceBetween(
+          latitude,
+          longitude,
+          service.latitude,
+          service.longitude,
+        );
+        return EmergencyService(
+          id: service.id,
+          name: service.name,
+          type: service.type,
+          address: service.address,
+          latitude: service.latitude,
+          longitude: service.longitude,
+          phoneNumber: service.phoneNumber,
+          rating: service.rating,
+          website: service.website,
+          openingHours: service.openingHours,
+          isOpen: service.isOpen,
+          distanceInKm: distanceMeters / 1000.0,
+        );
+      }).toList();
 
-      // Mock data for testing
-      return _getMockServices(type);
+      // Filter by radius
+      final filteredServices = servicesWithDistance.where((service) {
+         return service.distanceInKm * 1000 <= radiusInMeters;
+      }).toList();
+
+      // Sort by distance
+      filteredServices.sort((a, b) => a.distanceInKm.compareTo(b.distanceInKm));
+
+      return filteredServices;
     } catch (e) {
       throw Exception('Failed to find nearby services: $e');
     }
@@ -134,9 +158,9 @@ class EmergencyServiceAPI {
         id: 'police_001',
         name: 'Mumbai Central Police Station',
         type: EmergencyServiceType.police,
-        address: 'Fort, Mumbai',
-        latitude: 18.9520,
-        longitude: 72.8347,
+        address: 'Mumbai Central, Mumbai',
+        latitude: 18.9669,
+        longitude: 72.8193,
         phoneNumber: '100',
         rating: 4.5,
         isOpen: true,
@@ -146,9 +170,9 @@ class EmergencyServiceAPI {
         id: 'police_002',
         name: 'Bandra Police Station',
         type: EmergencyServiceType.police,
-        address: 'Bandra, Mumbai',
-        latitude: 19.0596,
-        longitude: 72.8295,
+        address: 'Bandra West, Mumbai',
+        latitude: 19.0558,
+        longitude: 72.8360,
         phoneNumber: '100',
         rating: 4.2,
         isOpen: true,
@@ -158,9 +182,9 @@ class EmergencyServiceAPI {
         id: 'police_003',
         name: 'Andheri Police Station',
         type: EmergencyServiceType.police,
-        address: 'Andheri, Mumbai',
-        latitude: 19.1136,
-        longitude: 72.8697,
+        address: 'Andheri East, Mumbai',
+        latitude: 19.1197,
+        longitude: 72.8465,
         phoneNumber: '100',
         rating: 4.0,
         isOpen: true,
@@ -188,9 +212,9 @@ class EmergencyServiceAPI {
         id: 'hospital_002',
         name: 'Apollo Hospitals',
         type: EmergencyServiceType.hospital,
-        address: 'Thane, Mumbai',
-        latitude: 19.2183,
-        longitude: 72.9781,
+        address: 'Navi Mumbai, Maharashtra',
+        latitude: 19.0229,
+        longitude: 73.0401,
         phoneNumber: '022-2345-6789',
         rating: 4.6,
         website: 'https://www.apollohospitals.com',
@@ -201,13 +225,73 @@ class EmergencyServiceAPI {
         id: 'hospital_003',
         name: 'Kokilaben Hospital',
         type: EmergencyServiceType.hospital,
-        address: 'Mahim, Mumbai',
-        latitude: 19.0398,
-        longitude: 72.8228,
+        address: 'Andheri West, Mumbai',
+        latitude: 19.1311,
+        longitude: 72.8252,
         phoneNumber: '022-3456-7890',
         rating: 4.8,
         isOpen: true,
         distanceInKm: 2.0,
+      ),
+      EmergencyService(
+        id: 'hospital_004',
+        name: 'Lilavati Hospital',
+        type: EmergencyServiceType.hospital,
+        address: 'Bandra West, Mumbai',
+        latitude: 19.0506,
+        longitude: 72.8285,
+        phoneNumber: '022-2666-6666',
+        rating: 4.5,
+        isOpen: true,
+        distanceInKm: 0.0,
+      ),
+      EmergencyService(
+        id: 'hospital_005',
+        name: 'Nanavati Super Speciality Hospital',
+        type: EmergencyServiceType.hospital,
+        address: 'Vile Parle West, Mumbai',
+        latitude: 19.0963,
+        longitude: 72.8398,
+        phoneNumber: '022-2626-7000',
+        rating: 4.4,
+        isOpen: true,
+        distanceInKm: 0.0,
+      ),
+      EmergencyService(
+        id: 'hospital_006',
+        name: 'Hinduja Hospital',
+        type: EmergencyServiceType.hospital,
+        address: 'Mahim West, Mumbai',
+        latitude: 19.0345,
+        longitude: 72.8388,
+        phoneNumber: '022-2445-1515',
+        rating: 4.6,
+        isOpen: true,
+        distanceInKm: 0.0,
+      ),
+      EmergencyService(
+        id: 'hospital_007',
+        name: 'Breach Candy Hospital',
+        type: EmergencyServiceType.hospital,
+        address: 'Breach Candy, Mumbai',
+        latitude: 18.9669,
+        longitude: 72.8028,
+        phoneNumber: '022-2366-7788',
+        rating: 4.5,
+        isOpen: true,
+        distanceInKm: 0.0,
+      ),
+      EmergencyService(
+        id: 'hospital_008',
+        name: 'Hiranandani Hospital',
+        type: EmergencyServiceType.hospital,
+        address: 'Powai, Mumbai',
+        latitude: 19.1171,
+        longitude: 72.9099,
+        phoneNumber: '022-2576-3300',
+        rating: 4.3,
+        isOpen: true,
+        distanceInKm: 0.0,
       ),
     ];
   }

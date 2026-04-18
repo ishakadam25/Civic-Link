@@ -33,14 +33,19 @@ class _EmergencyScreenState extends State<EmergencyScreen>
 
   /// Initialize emergency services on screen load
   void _initializeEmergencyServices() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final locationProvider = context.read<LocationProvider>();
+      
+      if (!locationProvider.locationPermissionGranted) {
+        await locationProvider.requestLocationPermission();
+      }
+      
       if (locationProvider.currentLocation != null) {
         final emergencyProvider = context.read<EmergencyProvider>();
         emergencyProvider.fetchNearbyServices(
           locationProvider.currentLocation!.latitude,
           locationProvider.currentLocation!.longitude,
-          radiusInMeters: 5000,
+          radiusInMeters: 50000, // Increased to 50km to capture all mock data across Mumbai
         );
       }
     });
@@ -53,6 +58,37 @@ class _EmergencyScreenState extends State<EmergencyScreen>
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     }
+  }
+
+  /// Handle SOS button press
+  void _handleSOS() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Emergency SOS'),
+        content: const Text('Are you sure you want to call the emergency services?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            onPressed: () {
+              Navigator.pop(context);
+              final provider = context.read<EmergencyProvider>();
+              if (provider.policeStations.isNotEmpty) {
+                // Stations are already distance sorted, so first is nearest
+                _makeCall(provider.policeStations.first.phoneNumber);
+              } else {
+                _makeCall('100');
+              }
+            },
+            child: const Text('Call Now'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -108,6 +144,29 @@ class _EmergencyScreenState extends State<EmergencyScreen>
 
           return Column(
             children: [
+              // SOS Button
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 60,
+                  child: ElevatedButton.icon(
+                    onPressed: _handleSOS,
+                    icon: const Icon(Icons.warning_amber_rounded, size: 32),
+                    label: const Text(
+                      'SOS EMERGENCY',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red.shade700,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
               // Quick emergency contacts
               Container(
                 color: Colors.red.shade50,
@@ -301,6 +360,15 @@ class _EmergencyScreenState extends State<EmergencyScreen>
       );
     }
 
+    EmergencyService? recommendedService;
+    if (services.isNotEmpty) {
+      recommendedService = services.reduce((curr, next) {
+        final scoreCurr = (curr.rating ?? 0) / (curr.distanceInKm > 0 ? curr.distanceInKm : 0.1);
+        final scoreNext = (next.rating ?? 0) / (next.distanceInKm > 0 ? next.distanceInKm : 0.1);
+        return scoreCurr > scoreNext ? curr : next;
+      });
+    }
+
     return RefreshIndicator(
       onRefresh: () async {
         onRetry?.call();
@@ -312,12 +380,13 @@ class _EmergencyScreenState extends State<EmergencyScreen>
           final service = services[index];
           return EmergencyServiceCard(
             service: service,
+            isRecommended: service == recommendedService,
             onCall: () => _makeCall(service.phoneNumber),
             onNavigate: () {
-              // Navigate to location using Google Maps
+              // Navigate to location using Google Maps directions
               final mapsUrl =
-                  'https://www.google.com/maps/search/?api=1&query=${service.latitude},${service.longitude}';
-              launchUrl(Uri.parse(mapsUrl));
+                  'https://www.google.com/maps/dir/?api=1&destination=${service.latitude},${service.longitude}';
+              launchUrl(Uri.parse(mapsUrl), mode: LaunchMode.externalApplication);
             },
           );
         },
