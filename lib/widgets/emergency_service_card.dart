@@ -6,12 +6,14 @@ class EmergencyServiceCard extends StatelessWidget {
   final EmergencyService service;
   final VoidCallback? onCall;
   final VoidCallback? onNavigate;
+  final bool isRecommended;
 
   const EmergencyServiceCard({
     Key? key,
     required this.service,
     this.onCall,
     this.onNavigate,
+    this.isRecommended = false,
   }) : super(key: key);
 
   Color _getServiceColor() {
@@ -122,6 +124,23 @@ class EmergencyServiceCard extends StatelessWidget {
                     ),
                 ],
               ),
+              if (isRecommended)
+                Container(
+                  margin: const EdgeInsets.only(top: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.green,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text(
+                    'Recommended',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               const SizedBox(height: 8),
               // Address
               Row(

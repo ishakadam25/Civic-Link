@@ -4,6 +4,7 @@ import '../../providers/weather_provider.dart';
 import '../../providers/location_provider.dart';
 import '../../widgets/weather_card.dart';
 import '../../widgets/emergency_service_card.dart';
+import '../../models/weather_model.dart';
 
 /// Screen to display weather information
 class WeatherScreen extends StatefulWidget {
@@ -22,8 +23,13 @@ class _WeatherScreenState extends State<WeatherScreen> {
 
   /// Initialize weather data on screen load
   void _initializeWeather() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final locationProvider = context.read<LocationProvider>();
+      
+      if (!locationProvider.locationPermissionGranted) {
+        await locationProvider.requestLocationPermission();
+      }
+      
       if (locationProvider.currentLocation != null) {
         final weatherProvider = context.read<WeatherProvider>();
         weatherProvider.fetchWeather(
@@ -137,17 +143,21 @@ class _WeatherScreenState extends State<WeatherScreen> {
               padding: const EdgeInsets.all(16),
               children: [
                 // Current weather card
-                WeatherCard(
-                  weather: weatherProvider.currentWeather!,
-                  onRefresh: () {
-                    if (locationProvider.currentLocation != null) {
-                      weatherProvider.fetchWeather(
-                        locationProvider.currentLocation!.latitude,
-                        locationProvider.currentLocation!.longitude,
-                      );
-                    }
-                  },
-                ),
+                if (weatherProvider.currentWeather != null) ...[
+                  WeatherCard(
+                    weather: weatherProvider.currentWeather!,
+                    onRefresh: () {
+                      if (locationProvider.currentLocation != null) {
+                        weatherProvider.fetchWeather(
+                          locationProvider.currentLocation!.latitude,
+                          locationProvider.currentLocation!.longitude,
+                        );
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  _buildWeatherInsight(weatherProvider.currentWeather!),
+                ],
                 const SizedBox(height: 24),
 
                 // Forecast section
@@ -246,5 +256,58 @@ class _WeatherScreenState extends State<WeatherScreen> {
   /// Format time for display
   String _formatTime(DateTime dateTime) {
     return '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+  }
+
+  /// Build dynamic weather insight message
+  Widget _buildWeatherInsight(WeatherData weather) {
+    String insightMessage = '';
+    IconData insightIcon = Icons.info_outline;
+    Color insightColor = Colors.blue;
+
+    final condition = weather.main.toLowerCase();
+    final description = weather.description.toLowerCase();
+
+    if (weather.temperature > 35.0) {
+      insightMessage = 'High temperature, stay hydrated';
+      insightIcon = Icons.local_drink;
+      insightColor = Colors.orange;
+    } else if (condition.contains('rain') || description.contains('rain') || condition.contains('drizzle')) {
+      insightMessage = 'Carry an umbrella';
+      insightIcon = Icons.umbrella;
+      insightColor = Colors.blueGrey;
+    } else if (weather.temperature < 15.0) {
+      insightMessage = 'It is getting cold, wear a jacket';
+      insightIcon = Icons.ac_unit;
+      insightColor = Colors.cyan;
+    } else {
+      insightMessage = 'Pleasant weather, enjoy your day!';
+      insightIcon = Icons.wb_sunny;
+      insightColor = Colors.green;
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: insightColor.withOpacity(0.1),
+        border: Border.all(color: insightColor.withOpacity(0.5)),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(insightIcon, color: insightColor, size: 32),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              insightMessage,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
