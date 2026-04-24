@@ -14,6 +14,7 @@ class RaiseComplaintScreen extends StatefulWidget {
 
 class _RaiseComplaintScreenState extends State<RaiseComplaintScreen> {
   final TextEditingController _descController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
 
   File? _image;
   String? _imageUrl;
@@ -50,6 +51,7 @@ class _RaiseComplaintScreenState extends State<RaiseComplaintScreen> {
     }
 
     await FirebaseFirestore.instance.collection('complaints').add({
+      "title": _titleController.text,
       'description': _descController.text,
       'imageUrl': _imageUrl,
       'area': _selectedArea,
@@ -100,6 +102,14 @@ class _RaiseComplaintScreenState extends State<RaiseComplaintScreen> {
             ),
 
             const SizedBox(height: 20),
+
+            TextField(
+              controller: _titleController,
+              decoration: const InputDecoration(
+                labelText: "Title",
+                border: OutlineInputBorder(),
+              ),
+            ),
 
             TextField(
               controller: _descController,

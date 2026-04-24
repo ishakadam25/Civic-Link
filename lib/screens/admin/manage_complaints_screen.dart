@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'complaint_detail_screen.dart';
 
 class ManageComplaintsScreen extends StatefulWidget {
   const ManageComplaintsScreen({super.key});
@@ -11,11 +12,14 @@ class ManageComplaintsScreen extends StatefulWidget {
 class _ManageComplaintsScreenState extends State<ManageComplaintsScreen> {
   String selectedArea = "All";
   DateTime? selectedDate;
+  String searchQuery = "";
 
   final List<String> areas = ["All", "Dadar", "Andheri", "Bandra", "Kurla"];
 
-  Query _getFilteredQuery() {
-    Query query = FirebaseFirestore.instance.collection('complaints');
+  Query<Map<String, dynamic>> _getFilteredQuery() {
+    Query<Map<String, dynamic>> query = FirebaseFirestore.instance.collection(
+      'complaints',
+    );
     if (selectedArea != "All") {
       query = query.where('area', isEqualTo: selectedArea);
     }
@@ -35,6 +39,18 @@ class _ManageComplaintsScreenState extends State<ManageComplaintsScreen> {
       // Note: For exact date filtering, you may need to adjust based on your Firestore schema
     }
     return query.orderBy('timestamp', descending: true);
+  }
+
+  Color _getStatusColor(String? status) {
+    switch (status) {
+      case 'Resolved':
+      case 'Completed':
+        return Colors.green;
+      case 'In Progress':
+        return Colors.orange;
+      default:
+        return Colors.red;
+    }
   }
 
   @override
@@ -79,12 +95,27 @@ class _ManageComplaintsScreenState extends State<ManageComplaintsScreen> {
                   },
                   child: const Text("Select Date"),
                 ),
+                const SizedBox(height: 10),
+                TextField(
+                  decoration: InputDecoration(
+                    hintText: "Search complaints...",
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      searchQuery = value.toLowerCase();
+                    });
+                  },
+                ),
               ],
             ),
           ),
           // 🔥 FILTERED COMPLAINTS LIST
           Expanded(
-            child: StreamBuilder<QuerySnapshot>(
+            child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
               stream: _getFilteredQuery().snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -93,17 +124,94 @@ class _ManageComplaintsScreenState extends State<ManageComplaintsScreen> {
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                   return const Center(child: Text("No complaints found"));
                 }
-                final complaints = snapshot.data!.docs;
+                final allComplaints = snapshot.data!.docs;
+
+                // Filter by search query
+                final filteredComplaints = allComplaints.where((doc) {
+                  final data = doc.data() as Map<String, dynamic>;
+                  final title = (data['title'] ?? '').toString().toLowerCase();
+                  final description = (data['description'] ?? '')
+                      .toString()
+                      .toLowerCase();
+                  return title.contains(searchQuery) ||
+                      description.contains(searchQuery);
+                }).toList();
+
+                if (filteredComplaints.isEmpty) {
+                  return const Center(child: Text("No complaints found"));
+                }
+
                 return ListView.builder(
-                  itemCount: complaints.length,
+                  itemCount: filteredComplaints.length,
                   itemBuilder: (context, index) {
-                    final data =
-                        complaints[index].data() as Map<String, dynamic>;
+                    final doc = filteredComplaints[index];
+                    final data = doc.data() as Map<String, dynamic>;
+
                     return Card(
-                      child: ListTile(
-                        title: Text(data['title'] ?? 'No title'),
-                        subtitle: Text(data['description'] ?? 'No description'),
-                        // Add more fields like date, status, etc., as needed
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  ComplaintDetailScreen(complaintId: doc.id),
+                            ),
+                          );
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (data['imageUrl'] != null &&
+                                data['imageUrl'].toString().isNotEmpty)
+                              ClipRRect(
+                                borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(12),
+                                ),
+                                child: Image.network(
+                                  data['imageUrl'],
+                                  height: 150,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ListTile(
+                              title: Text(
+                                data['title'] ?? 'No title',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(height: 6),
+                                  Text(data['description'] ?? 'No description'),
+                                  const SizedBox(height: 8),
+                                  Text("Area: ${data['area'] ?? ''}"),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    "Status: ${data['status'] ?? 'pending'}",
+                                    style: TextStyle(
+                                      color: _getStatusColor(
+                                        data['status']?.toString(),
+                                      ),
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              trailing: const Icon(Icons.arrow_forward_ios),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   },
