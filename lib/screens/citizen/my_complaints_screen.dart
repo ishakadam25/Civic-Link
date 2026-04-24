@@ -2,16 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-
 class MyComplaintsScreen extends StatelessWidget {
   const MyComplaintsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("My Complaints"),
-      ),
+      appBar: AppBar(title: const Text("My Complaints")),
 
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
@@ -21,7 +18,6 @@ class MyComplaintsScreen extends StatelessWidget {
             .snapshots(),
 
         builder: (context, snapshot) {
-
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -51,7 +47,6 @@ class MyComplaintsScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
 
                     children: [
-
                       if (data['imageUrl'] != null)
                         ClipRRect(
                           borderRadius: BorderRadius.circular(10),
@@ -105,6 +100,7 @@ class MyComplaintsScreen extends StatelessWidget {
   static Color _getStatusColor(String? status) {
     switch (status) {
       case 'Resolved':
+      case 'Completed':
         return Colors.green;
       case 'In Progress':
         return Colors.orange;
