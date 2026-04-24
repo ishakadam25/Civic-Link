@@ -9,12 +9,12 @@ class EmergencyServiceCard extends StatelessWidget {
   final bool isRecommended;
 
   const EmergencyServiceCard({
-    Key? key,
+    super.key,
     required this.service,
     this.onCall,
     this.onNavigate,
     this.isRecommended = false,
-  }) : super(key: key);
+  });
 
   Color _getServiceColor() {
     switch (service.type) {
@@ -248,10 +248,10 @@ class QuickEmergencyButton extends StatelessWidget {
   final VoidCallback onPressed;
 
   const QuickEmergencyButton({
-    Key? key,
+    super.key,
     required this.contact,
     required this.onPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -297,9 +297,9 @@ class LoadingStateWidget extends StatelessWidget {
   final String message;
 
   const LoadingStateWidget({
-    Key? key,
+    super.key,
     this.message = 'Loading...',
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -322,10 +322,10 @@ class ErrorStateWidget extends StatelessWidget {
   final VoidCallback? onRetry;
 
   const ErrorStateWidget({
-    Key? key,
+    super.key,
     required this.message,
     this.onRetry,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

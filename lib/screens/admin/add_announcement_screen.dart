@@ -71,7 +71,7 @@ class _AddAnnouncementScreenState extends State<AddAnnouncementScreen> {
             const SizedBox(height: 20),
 
             DropdownButtonFormField<String>(
-              value: selectedArea,
+              initialValue: selectedArea,
               items: areas.map((area) {
                 return DropdownMenuItem(value: area, child: Text(area));
               }).toList(),

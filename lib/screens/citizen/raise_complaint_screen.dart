@@ -85,7 +85,7 @@ class _RaiseComplaintScreenState extends State<RaiseComplaintScreen> {
             const SizedBox(height: 20),
 
             DropdownButtonFormField<String>(
-              value: _selectedArea,
+              initialValue: _selectedArea,
               hint: const Text("Select Area"),
               items: ["Andheri", "Bandra", "Dadar", "Powai", "Kurla"].map((
                 area,

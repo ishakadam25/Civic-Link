@@ -2,6 +2,7 @@
 ///
 /// This file shows the recommended way to set up providers and routes
 /// for the Government Services feature.
+library;
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -32,7 +33,7 @@ void main() async {
 }
 
 class CivicLinkApp extends StatelessWidget {
-  const CivicLinkApp({Key? key}) : super(key: key);
+  const CivicLinkApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +80,7 @@ class CivicLinkApp extends StatelessWidget {
 class CivicLinkHome extends StatefulWidget {
   final String role;
 
-  const CivicLinkHome({Key? key, required this.role}) : super(key: key);
+  const CivicLinkHome({super.key, required this.role});
 
   @override
   State<CivicLinkHome> createState() => _CivicLinkHomeState();

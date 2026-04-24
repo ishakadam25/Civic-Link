@@ -19,7 +19,7 @@ void openMIndicator() async {
 }
 
 class GovernmentServicesScreen extends StatefulWidget {
-  const GovernmentServicesScreen({Key? key}) : super(key: key);
+  const GovernmentServicesScreen({super.key});
 
   @override
   State<GovernmentServicesScreen> createState() =>

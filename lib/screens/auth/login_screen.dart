@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
 import 'register_screen.dart';
-import '../citizen/home_screen.dart'; // or wherever your main screen is
+// or wherever your main screen is
 import '../../main.dart'; // because CivicLinkHome is in main.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../admin/admin_home_screen.dart';
-import '../../main.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

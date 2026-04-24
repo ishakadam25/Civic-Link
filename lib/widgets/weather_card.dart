@@ -7,10 +7,10 @@ class WeatherCard extends StatelessWidget {
   final VoidCallback? onRefresh;
 
   const WeatherCard({
-    Key? key,
+    super.key,
     required this.weather,
     this.onRefresh,
-  }) : super(key: key);
+  });
 
   /// Get weather icon based on condition
   String _getWeatherIcon(String condition) {
@@ -180,9 +180,9 @@ class WeatherForecastCard extends StatelessWidget {
   final WeatherForecast forecast;
 
   const WeatherForecastCard({
-    Key? key,
+    super.key,
     required this.forecast,
-  }) : super(key: key);
+  });
 
   String _getWeatherIcon(String condition) {
     switch (condition.toLowerCase()) {

@@ -49,7 +49,7 @@ class _ManageComplaintsScreenState extends State<ManageComplaintsScreen> {
             child: Column(
               children: [
                 DropdownButtonFormField<String>(
-                  value: selectedArea,
+                  initialValue: selectedArea,
                   items: areas.map((area) {
                     return DropdownMenuItem<String>(
                       value: area,

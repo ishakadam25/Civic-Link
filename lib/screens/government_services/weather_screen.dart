@@ -8,7 +8,7 @@ import '../../models/weather_model.dart';
 
 /// Screen to display weather information
 class WeatherScreen extends StatefulWidget {
-  const WeatherScreen({Key? key}) : super(key: key);
+  const WeatherScreen({super.key});
 
   @override
   State<WeatherScreen> createState() => _WeatherScreenState();

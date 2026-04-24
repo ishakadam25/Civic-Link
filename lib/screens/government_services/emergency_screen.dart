@@ -8,7 +8,7 @@ import '../../widgets/emergency_service_card.dart';
 
 /// Screen to display emergency services
 class EmergencyScreen extends StatefulWidget {
-  const EmergencyScreen({Key? key}) : super(key: key);
+  const EmergencyScreen({super.key});
 
   @override
   State<EmergencyScreen> createState() => _EmergencyScreenState();
