@@ -12,7 +12,12 @@
           "package_name": "com.example.civiclink_mumbai"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "625527546721-ns3je6ep1176sggd8tsss5gsvoq1upnr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCLFfghM0Cpz7IociyndWgHkO0afABkS9I"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "625527546721-ns3je6ep1176sggd8tsss5gsvoq1upnr.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "625527546721-gf0ue12fjsa72e9p9357pf4j049rb2tc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.civiclinkMumbai"
+              }
+            }
+          ]
         }
       }
     }

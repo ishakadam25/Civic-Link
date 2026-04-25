@@ -27,13 +27,12 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: "AIzaSyAuYqvTDn1-4vG31vPNAUlqYbNRsCJXRPs",
-    authDomain: "civic-link-878a6.firebaseapp.com",
-    projectId: "civic-link-878a6",
-    storageBucket: "civic-link-878a6.firebasestorage.app",
-    messagingSenderId: "361787266234",
-    appId: "1:361787266234:web:fb9a44e14dbd15d0f15e83",
-    measurementId: "G-SXCYLHY50R",
+    apiKey: "AIzaSyAphvQqenvrCGg5H7jqiDH3TJO5bTcglA8",
+    authDomain: "civiclink-mumbai.firebaseapp.com",
+    projectId: "civiclink-mumbai",
+    storageBucket: "civiclink-mumbai.firebasestorage.app",
+    messagingSenderId: "625527546721",
+    appId: "1:625527546721:web:cd7220d3e7c9126f339b20",
   );
 
   static const FirebaseOptions android = FirebaseOptions(

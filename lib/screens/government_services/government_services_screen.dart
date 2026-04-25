@@ -7,10 +7,9 @@ import 'package:url_launcher/url_launcher.dart';
 
 /// Main government services screen with navigation to features
 
-
 void openMIndicator() async {
   final url = Uri.parse(
-    "https://play.google.com/store/apps/details?id=com.mobond.mindicator",
+    'https://play.google.com/store/apps/details?id=com.mobond.mindicator',
   );
 
   if (await canLaunchUrl(url)) {
@@ -33,7 +32,27 @@ class _GovernmentServicesScreenState extends State<GovernmentServicesScreen> {
     _requestLocationPermission();
   }
 
-  /// Request location permission on screen load
+  void _showHelpDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Government Services Help'),
+          content: const Text(
+            'Use this section to access local services, emergency contacts, travel tools, '
+            'and quick help guidance. Tap any card to open the service or learn more.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _requestLocationPermission() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final locationProvider = context.read<LocationProvider>();
@@ -50,51 +69,47 @@ class _GovernmentServicesScreenState extends State<GovernmentServicesScreen> {
         title: const Text('Government Services'),
         elevation: 0,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Header section
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.blue.shade400,
-                    Colors.blue.shade600,
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.only(bottom: 24),
+          child: Column(
+            children: [
+              Container(
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFF3B5CE8), Color(0xFF6F8AE4)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                 ),
-              ),
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Welcome to Civic Link',
+                    'Government Services',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 24,
+                      fontSize: 28,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
                   const Text(
-                    'Quick access to essential government services',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                    ),
+                    'Access weather, emergency support, and city resources in one place.',
+                    style: TextStyle(color: Colors.white70, fontSize: 15),
                   ),
-                  const SizedBox(height: 16),
-                  // Location status
+                  const SizedBox(height: 20),
                   Consumer<LocationProvider>(
                     builder: (context, locationProvider, _) {
                       return Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(8),
+                          color: Colors.white.withOpacity(0.18),
+                          borderRadius: BorderRadius.circular(18),
                         ),
-                        padding: const EdgeInsets.all(12),
                         child: Row(
                           children: [
                             Icon(
@@ -102,14 +117,13 @@ class _GovernmentServicesScreenState extends State<GovernmentServicesScreen> {
                                   ? Icons.location_on
                                   : Icons.location_off,
                               color: Colors.white,
-                              size: 20,
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 10),
                             Expanded(
                               child: Text(
                                 locationProvider.locationPermissionGranted
-                                    ? 'Location enabled'
-                                    : 'Location permission required',
+                                    ? 'Location enabled for local services'
+                                    : 'Enable location for better recommendations',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 14,
@@ -134,19 +148,14 @@ class _GovernmentServicesScreenState extends State<GovernmentServicesScreen> {
                 ],
               ),
             ),
-
-            // Services grid
             Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'Services',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    'Quick access',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
                   GridView.count(
@@ -159,8 +168,8 @@ class _GovernmentServicesScreenState extends State<GovernmentServicesScreen> {
                       _buildServiceCard(
                         context,
                         title: 'Weather',
-                        icon: '🌤️',
-                        description: 'Check weather forecast',
+                        icon: '🌤',
+                        description: 'Check local forecasts',
                         color: Colors.blue,
                         onTap: () {
                           Navigator.of(context).push(
@@ -174,7 +183,7 @@ class _GovernmentServicesScreenState extends State<GovernmentServicesScreen> {
                         context,
                         title: 'Emergency',
                         icon: '🚨',
-                        description: 'Find emergency services',
+                        description: 'Nearby support services',
                         color: Colors.red,
                         onTap: () {
                           Navigator.of(context).push(
@@ -184,38 +193,51 @@ class _GovernmentServicesScreenState extends State<GovernmentServicesScreen> {
                           );
                         },
                       ),
+                      _buildServiceCard(
+                        context,
+                        title: 'Travel',
+                        icon: '🚆',
+                        description: 'Open transit options',
+                        color: Colors.deepPurple,
+                        onTap: openMIndicator,
+                      ),
+                      _buildServiceCard(
+                        context,
+                        title: 'Help',
+                        icon: '💡',
+                        description: 'City guidance, support and FAQs',
+                        color: Colors.teal,
+                        onTap: _showHelpDialog,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 24),
-                  
-                  // Information section
                   const Text(
-                    'About This Feature',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    'Why this matters',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
                   Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                     child: Padding(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(18),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildInfoItem(
                             'Weather Updates',
-                            'Real-time weather conditions and 5-day forecasts for your location',
+                            'Real-time forecasts and alert notifications for your area.',
                           ),
                           const SizedBox(height: 12),
                           _buildInfoItem(
                             'Emergency Services',
-                            'Quick access to nearby police, hospitals, ambulances, and fire stations',
+                            'Direct access to nearby police, hospitals, and ambulances.',
                           ),
                           const SizedBox(height: 12),
                           _buildInfoItem(
                             'Quick Contacts',
-                            'Direct phone buttons for emergency numbers (100, 101, 102, etc.)',
+                            'Save time with easy access to local helpline numbers.',
                           ),
                         ],
                       ),
@@ -227,10 +249,9 @@ class _GovernmentServicesScreenState extends State<GovernmentServicesScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 
-  /// Build service card widget
   Widget _buildServiceCard(
     BuildContext context, {
     required String title,
@@ -241,86 +262,56 @@ class _GovernmentServicesScreenState extends State<GovernmentServicesScreen> {
   }) {
     return GestureDetector(
       onTap: onTap,
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            gradient: LinearGradient(
-              colors: [
-                color.withOpacity(0.1),
-                color.withOpacity(0.05),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: color.withOpacity(0.15)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
             ),
-            border: Border.all(color: color.withOpacity(0.3)),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                icon,
-                style: const TextStyle(fontSize: 48),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Text(
-                  description,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Icon(
-                Icons.arrow_forward,
+          ],
+        ),
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(icon, style: const TextStyle(fontSize: 34)),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
                 color: color,
-                size: 20,
               ),
-            ],
-          ),
+            ),
+            const Spacer(),
+            Text(
+              description,
+              style: const TextStyle(color: Colors.black54, fontSize: 13),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  /// Build information item
   Widget _buildInfoItem(String title, String description) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 4),
         Text(
           description,
-          style: const TextStyle(
-            fontSize: 13,
-            color: Colors.grey,
-          ),
+          style: const TextStyle(fontSize: 13, color: Colors.black54),
         ),
       ],
     );

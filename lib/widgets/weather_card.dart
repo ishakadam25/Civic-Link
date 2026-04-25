@@ -203,44 +203,55 @@ class WeatherForecastCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          children: [
-            Text(
-              '${forecast.dateTime.day}/${forecast.dateTime.month}',
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
+    return SizedBox(
+      height: 150,
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        elevation: 1.6,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                '${forecast.dateTime.day}/${forecast.dateTime.month}',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              _getWeatherIcon(forecast.main),
-              style: const TextStyle(fontSize: 32),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '${forecast.tempMax.toStringAsFixed(0)}°',
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            Text(
-              '${forecast.tempMin.toStringAsFixed(0)}°',
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.grey,
+              Text(
+                _getWeatherIcon(forecast.main),
+                style: const TextStyle(fontSize: 32),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '${(forecast.rainProbability * 100).toStringAsFixed(0)}%',
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.blue,
+              Column(
+                children: [
+                  Text(
+                    '${forecast.tempMax.toStringAsFixed(0)}°',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
+                    '${forecast.tempMin.toStringAsFixed(0)}°',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
+              Text(
+                '${(forecast.rainProbability * 100).toStringAsFixed(0)}% rain',
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.blue,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

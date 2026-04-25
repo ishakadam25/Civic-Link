@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../services/cloudinary_service.dart';
@@ -11,7 +11,7 @@ class TestUploadScreen extends StatefulWidget {
 }
 
 class _TestUploadScreenState extends State<TestUploadScreen> {
-  File? _image;
+  Uint8List? _imageBytes;
   String? _imageUrl;
   bool _isUploading = false;
 
@@ -22,17 +22,16 @@ class _TestUploadScreenState extends State<TestUploadScreen> {
 
     if (pickedFile == null) return;
 
-    final file = File(pickedFile.path);
-
     setState(() {
-      _image = file;
       _isUploading = true;
       _imageUrl = null; // reset previous URL
     });
 
-    final url = await CloudinaryService.uploadImage(file);
+    final url = await CloudinaryService.uploadImage(pickedFile);
+    final bytes = await pickedFile.readAsBytes();
 
     setState(() {
+      _imageBytes = bytes;
       _imageUrl = url;
       _isUploading = false;
     });
@@ -59,10 +58,10 @@ class _TestUploadScreenState extends State<TestUploadScreen> {
 
               const SizedBox(height: 20),
 
-              if (_image != null)
+              if (_imageBytes != null)
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.file(_image!, height: 150),
+                  child: Image.memory(_imageBytes!, height: 150),
                 ),
 
               const SizedBox(height: 20),

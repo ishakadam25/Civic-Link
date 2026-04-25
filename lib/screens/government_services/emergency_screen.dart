@@ -93,11 +93,12 @@ class _EmergencyScreenState extends State<EmergencyScreen>
 
   @override
   Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).colorScheme.primary;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Emergency Services'),
         elevation: 0,
-        backgroundColor: Colors.red.shade600,
+        backgroundColor: primaryColor,
       ),
       body: Consumer2<LocationProvider, EmergencyProvider>(
         builder: (context, locationProvider, emergencyProvider, _) {
@@ -158,7 +159,7 @@ class _EmergencyScreenState extends State<EmergencyScreen>
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red.shade700,
+                      backgroundColor: primaryColor,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -169,22 +170,30 @@ class _EmergencyScreenState extends State<EmergencyScreen>
               ),
               // Quick emergency contacts
               Container(
-                color: Colors.red.shade50,
+                color: primaryColor.withOpacity(0.08),
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Quick Emergency Contacts',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.red,
+                        color: primaryColor,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Tap any contact to call instantly.',
+                      style: TextStyle(
+                        color: Colors.grey.shade700,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
                     SizedBox(
-                      height: 140,
+                      height: 180,
                       child: ListView(
                         scrollDirection: Axis.horizontal,
                         children: [
@@ -240,9 +249,9 @@ class _EmergencyScreenState extends State<EmergencyScreen>
                   Tab(text: 'Ambulance'),
                   Tab(text: 'Fire'),
                 ],
-                labelColor: Colors.red,
-                unselectedLabelColor: Colors.grey,
-                indicatorColor: Colors.red,
+                labelColor: primaryColor,
+                unselectedLabelColor: Colors.grey.shade600,
+                indicatorColor: primaryColor,
               ),
               const SizedBox(height: 12),
               
